@@ -4,8 +4,9 @@ import { NextResponse } from 'next/server'
 export const revalidate = 3600
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
-// Для канала @Agrosanoat_uz нужно получить channelId через API или использовать username
-const YOUTUBE_CHANNEL_USERNAME = 'Agrosanoat_uz'
+// Channel ID канала (можно переопределить через переменную окружения)
+const DEFAULT_CHANNEL_ID = 'UC9fTKHUcaZOC9NO9xlVKldg'
+const YOUTUBE_CHANNEL_USERNAME = 'Agrosanoat_uz' // Используется как fallback для поиска
 
 export async function GET() {
   if (!YOUTUBE_API_KEY) {
@@ -16,10 +17,11 @@ export async function GET() {
   }
 
   try {
-    // Сначала получаем channelId
-    let channelId = process.env.YOUTUBE_CHANNEL_ID
+    // Сначала получаем channelId из переменной окружения, иначе используем дефолтный
+    let channelId = process.env.YOUTUBE_CHANNEL_ID || DEFAULT_CHANNEL_ID
 
-    if (!channelId) {
+    // Если channelId не указан, пытаемся найти через поиск (fallback)
+    if (!channelId || channelId === DEFAULT_CHANNEL_ID) {
       // Используем поиск для получения channelId по username (forUsername устарел)
       const searchResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&q=@${YOUTUBE_CHANNEL_USERNAME}&type=channel&part=snippet&maxResults=1`
@@ -33,7 +35,7 @@ export async function GET() {
       }
 
       // Если не получилось, пробуем без @
-      if (!channelId) {
+      if (!channelId || channelId === DEFAULT_CHANNEL_ID) {
         const searchResponse2 = await fetch(
           `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&q=${YOUTUBE_CHANNEL_USERNAME}&type=channel&part=snippet&maxResults=1`
         )

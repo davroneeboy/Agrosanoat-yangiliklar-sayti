@@ -300,7 +300,7 @@ const Footer = ({ currentLang }: FooterProps) => {
               ))}
             </ul>
           </div>
-        </div>
+          </div>
 
         {/* Форма и карта рядом */}
         <div className="mt-8 pt-8 border-t border-primary-700 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
@@ -426,18 +426,18 @@ const Footer = ({ currentLang }: FooterProps) => {
           <div className="flex flex-col items-center">
             <h4 className="text-base sm:text-lg font-semibold mb-3">{t.footer.socialMedia}</h4>
             <div className="flex space-x-4 justify-center">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  className="text-gray-300 hover:text-white transition-colors"
-                  aria-label={social.name}
-                  tabIndex={0}
-                >
-                  {social.icon}
-                </a>
-              ))}
-            </div>
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    className="text-gray-300 hover:text-white transition-colors"
+                    aria-label={social.name}
+                    tabIndex={0}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
           </div>
         </div>
       </div>

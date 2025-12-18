@@ -90,13 +90,13 @@ export default function AboutPage() {
                   {currentLang === 'ru' && 'Загрузка...'}
                   {currentLang === 'en' && 'Loading...'}
                 </p>
-              </div>
+                  </div>
             )}
 
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
                 {error}
-              </div>
+                </div>
             )}
 
             {!loading && !error && aboutData && (
@@ -116,7 +116,7 @@ export default function AboutPage() {
                         }}
                         dangerouslySetInnerHTML={{ __html: formatTextWithParagraphs(aboutData.about_us) }}
                       />
-                    </div>
+                </div>
                   </ScrollReveal>
                 )}
 
@@ -135,7 +135,7 @@ export default function AboutPage() {
                         }}
                         dangerouslySetInnerHTML={{ __html: formatTextWithParagraphs(aboutData.tashkilot_tizulma) }}
                       />
-                    </div>
+              </div>
                   </ScrollReveal>
                 )}
 
@@ -154,7 +154,7 @@ export default function AboutPage() {
                         }}
                         dangerouslySetInnerHTML={{ __html: formatTextWithParagraphs(aboutData.gov) }}
                       />
-                    </div>
+            </div>
                   </ScrollReveal>
                 )}
 
@@ -173,7 +173,7 @@ export default function AboutPage() {
                         }}
                         dangerouslySetInnerHTML={{ __html: formatTextWithParagraphs(aboutData.central_apparat) }}
                       />
-                    </div>
+                  </div>
                   </ScrollReveal>
                 )}
 
@@ -205,7 +205,7 @@ export default function AboutPage() {
                   {currentLang === 'ru' && 'Данные не найдены'}
                   {currentLang === 'en' && 'No data found'}
                 </p>
-              </div>
+                  </div>
             )}
 
             {/* Quick Links */}
