@@ -6,19 +6,156 @@ import Image from 'next/image'
 import { Language, getTranslation } from '@/lib/i18n'
 import { getNewsList, type News } from '@/lib/api-public'
 
+// Компонент слайдера изображений для новости
+type NewsImageSliderProps = {
+  newsItem: News
+  currentIndex: number
+  onImageChange: (index: number) => void
+  currentLang: Language
+  t: ReturnType<typeof getTranslation>
+}
+
+const NewsImageSlider = ({ newsItem, currentIndex, onImageChange, currentLang, t }: NewsImageSliderProps) => {
+  // Сначала thumb, затем images
+  const images: string[] = []
+  if (newsItem.thumb) {
+    images.push(newsItem.thumb)
+  }
+  if (newsItem.images && newsItem.images.length > 0) {
+    // Сортируем по order, если есть
+    const sortedImages = [...newsItem.images].sort((a, b) => (a.order || 0) - (b.order || 0))
+    sortedImages.forEach(img => {
+      if (img.image && !images.includes(img.image)) {
+        images.push(img.image)
+      }
+    })
+  }
+
+  const hasMultipleImages = images.length > 1
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onImageChange((currentIndex - 1 + images.length) % images.length)
+  }
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onImageChange((currentIndex + 1) % images.length)
+  }
+
+  if (images.length === 0) {
+    return (
+      <div className="relative h-48 overflow-hidden">
+        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+          <span className="text-gray-400">Нет изображения</span>
+        </div>
+        <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          {t.news.title}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative h-48 overflow-hidden group">
+      {images.map((image, index) => (
+        <div
+          key={`${newsItem.id}-${image}-${index}`}
+          className={`absolute inset-0 transition-opacity duration-500 ${
+            index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+          }`}
+        >
+          <Image
+            src={image}
+            alt={`${newsItem.title} - ${index + 1}`}
+            fill
+            className="object-cover hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 320px, 384px"
+            priority={index === 0}
+          />
+        </div>
+      ))}
+      
+      <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold z-20">
+        {t.news.title}
+      </div>
+
+      {hasMultipleImages && (
+        <>
+          {/* Кнопка предыдущего изображения */}
+          <button
+            onClick={handlePrev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100"
+            aria-label="Предыдущее изображение"
+            tabIndex={0}
+          >
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Кнопка следующего изображения */}
+          <button
+            onClick={handleNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100"
+            aria-label="Следующее изображение"
+            tabIndex={0}
+          >
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Индикаторы изображений */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex space-x-1.5">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onImageChange(index)
+                }}
+                className={`transition-all duration-300 rounded-full ${
+                  index === currentIndex
+                    ? 'w-6 h-2 bg-white shadow-lg'
+                    : 'w-2 h-2 bg-white/60 hover:bg-white/80'
+                }`}
+                aria-label={`Изображение ${index + 1}`}
+                tabIndex={0}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 type NewsSectionProps = {
   currentLang: Language
 }
 
 const NewsSection = ({ currentLang }: NewsSectionProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const intervalsRef = useRef<NodeJS.Timeout[]>([])
+  const isFetchingRef = useRef(false)
   const [news, setNews] = useState<News[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({})
   const t = getTranslation(currentLang)
 
   useEffect(() => {
+    // Защита от повторных запросов
+    if (isFetchingRef.current) return
+    
     async function fetchNews() {
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
+      
       try {
         setLoading(true)
         setError(null)
@@ -27,17 +164,71 @@ const NewsSection = ({ currentLang }: NewsSectionProps) => {
           ordering: '-created_at',
         })
         // Берем первые 6 новостей для главной страницы
-        setNews(response.results.slice(0, 6))
+        const newsData = response.results.slice(0, 6)
+        setNews(newsData)
+        // Инициализируем индексы изображений для каждой новости
+        const initialIndexes: { [key: number]: number } = {}
+        newsData.forEach((item) => {
+          initialIndexes[item.id] = 0
+        })
+        setCurrentImageIndex(initialIndexes)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Ошибка загрузки новостей')
         console.error('Ошибка загрузки новостей:', err)
       } finally {
         setLoading(false)
+        isFetchingRef.current = false
       }
     }
 
     fetchNews()
   }, [])
+
+  // Автоматическая смена изображений каждые 2 секунды
+  useEffect(() => {
+    // Очищаем предыдущие интервалы
+    intervalsRef.current.forEach((interval) => clearInterval(interval))
+    intervalsRef.current = []
+
+    if (news.length === 0) return
+
+    news.forEach((newsItem) => {
+      // Формируем массив изображений: сначала thumb, потом images
+      const images: string[] = []
+      if (newsItem.thumb) {
+        images.push(newsItem.thumb)
+      }
+      if (newsItem.images && newsItem.images.length > 0) {
+        const sortedImages = [...newsItem.images].sort((a, b) => (a.order || 0) - (b.order || 0))
+        sortedImages.forEach(img => {
+          if (img.image && !images.includes(img.image)) {
+            images.push(img.image)
+          }
+        })
+      }
+
+      if (images.length > 1) {
+        const newsItemId = newsItem.id
+        const imagesLength = images.length
+        const interval = setInterval(() => {
+          setCurrentImageIndex((prev) => {
+            const currentIdx = prev[newsItemId] ?? 0
+            const nextIdx = (currentIdx + 1) % imagesLength
+            return {
+              ...prev,
+              [newsItemId]: nextIdx,
+            }
+          })
+        }, 2000)
+        intervalsRef.current.push(interval)
+      }
+    })
+
+    return () => {
+      intervalsRef.current.forEach((interval) => clearInterval(interval))
+      intervalsRef.current = []
+    }
+  }, [news])
 
   const handlePrev = () => {
     if (scrollContainerRef.current) {
@@ -126,24 +317,18 @@ const NewsSection = ({ currentLang }: NewsSectionProps) => {
                 animationDelay: `${index * 0.15}s`,
               }}
             >
-              <div className="relative h-48 overflow-hidden">
-                  {newsItem.thumb ? (
-                    <Image
-                      src={newsItem.thumb}
-                      alt={newsItem.title}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 320px, 384px"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">Нет изображения</span>
-                    </div>
-                  )}
-                <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  {t.news.title}
-                </div>
-              </div>
+              <NewsImageSlider 
+                newsItem={newsItem}
+                currentIndex={currentImageIndex[newsItem.id] || 0}
+                onImageChange={(newIndex) => {
+                  setCurrentImageIndex((prev) => ({
+                    ...prev,
+                    [newsItem.id]: newIndex,
+                  }))
+                }}
+                currentLang={currentLang}
+                t={t}
+              />
               <div className="p-6">
                 <div className="text-sm text-gray-500 mb-2">
                     {t.news.date}: {formatDate(newsItem.created_at)}

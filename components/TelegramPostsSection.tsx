@@ -84,7 +84,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
         }
       } catch (error) {
         console.error('Failed to load Telegram posts:', error)
-        setError('Не удалось загрузить посты из Telegram')
+        setError(t.telegram.error)
         // Используем fallback данные
         setPostData(fallbackPosts)
       } finally {
@@ -107,26 +107,40 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
     }
   }
 
+  // Функция форматирования чисел для избежания проблем с гидратацией
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US')
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    
+    // Форматируем время
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const time = `${hours}:${minutes}`
+    
+    // Форматируем дату в зависимости от языка
+    const day = date.getDate()
+    const monthNames: { [key: string]: string[] } = {
+      uz: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'],
+      ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+      en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     }
-
+    
+    const month = monthNames[currentLang][date.getMonth()]
+    const year = date.getFullYear()
+    
     let formattedDate = ''
     if (currentLang === 'uz') {
-      formattedDate = date.toLocaleDateString('uz-UZ', options)
+      formattedDate = `${day}-${month}, ${year}`
     } else if (currentLang === 'ru') {
-      formattedDate = date.toLocaleDateString('ru-RU', options)
+      formattedDate = `${day} ${month} ${year}`
     } else {
-      formattedDate = date.toLocaleDateString('en-US', options)
+      formattedDate = `${month} ${day}, ${year}`
     }
 
-    return formattedDate
+    return `${time}, ${formattedDate}`
   }
 
   const handlePostClick = (postId: string) => {
@@ -149,7 +163,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-4xl font-bold text-gray-900 relative">
-              Telegram канал
+              {t.sections.telegram}
               <span className="absolute bottom-0 left-0 w-24 h-1 bg-primary-600"></span>
             </h2>
             <div className="flex items-center space-x-4">
@@ -175,14 +189,14 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Загрузка...
+                  {t.telegram.loading}
                 </div>
               )}
               <div className="flex space-x-2">
                 <button
                   onClick={handlePrev}
                   className="w-10 h-10 bg-primary-100 hover:bg-primary-200 text-primary-700 rounded-lg flex items-center justify-center transition-colors"
-                  aria-label="Предыдущие посты"
+                  aria-label={t.telegram.previous}
                   tabIndex={0}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +206,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                 <button
                   onClick={handleNext}
                   className="w-10 h-10 bg-primary-100 hover:bg-primary-200 text-primary-700 rounded-lg flex items-center justify-center transition-colors"
-                  aria-label="Следующие посты"
+                  aria-label={t.telegram.next}
                   tabIndex={0}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,7 +297,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        {post.views.toLocaleString()}
+                        {formatNumber(post.views)}
                       </div>
                     )}
                   </div>
@@ -317,7 +331,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                       onClick={(e) => e.stopPropagation()}
                       className="text-primary-600 font-semibold text-sm hover:text-primary-700 transition-colors"
                     >
-                      Читать →
+                      {t.telegram.readMore}
                     </a>
                   </div>
                 </div>
@@ -325,7 +339,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>Посты не найдены</p>
+                <p>{t.telegram.noPosts}</p>
               </div>
             )}
           </div>
@@ -345,7 +359,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
             <button
               onClick={handleClosePost}
               className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
-              aria-label="Закрыть пост"
+              aria-label={t.telegram.close}
               tabIndex={0}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -408,7 +422,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
-                          {post.views.toLocaleString()} просмотров
+                          {formatNumber(post.views)} {t.telegram.views}
                         </div>
                       </>
                     )}
@@ -431,7 +445,7 @@ const TelegramPostsSection = ({ currentLang }: TelegramPostsSectionProps) => {
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.053 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
                     </svg>
-                    Открыть в Telegram
+                    {t.telegram.openInTelegram}
                   </a>
                 </div>
               )

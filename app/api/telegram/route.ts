@@ -380,11 +380,6 @@ async function getTelegramPostsFromRSS(channelUsername: string) {
         }
       }
 
-      // Логируем для отладки (только первые 3 поста)
-      if (posts.length < 3) {
-        console.log(`Post ${postId}: mediaUrl=${mediaUrl?.substring(0, 50)}..., thumbnail=${thumbnail?.substring(0, 50)}..., mediaType=${mediaType}`)
-      }
-      
       posts.push({
         id: postId,
         messageId: parseInt(messageId, 10),

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
@@ -8,6 +9,102 @@ import { getTranslation } from '@/lib/i18n'
 import { useLanguage } from '@/lib/useLanguage'
 import Link from 'next/link'
 import Image from 'next/image'
+
+// Компонент для карточки менеджера
+type ManagerCardProps = {
+  manager: {
+    name: string
+    position: string
+    bio?: string
+    email?: string
+    phone?: string
+    website?: string
+    photo?: string
+    workingHours?: string
+  }
+  index: number
+}
+
+const ManagerCard = ({ manager, index }: ManagerCardProps) => {
+  const [imageError, setImageError] = useState(false)
+
+  return (
+    <div
+      key={index}
+      className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl animate-fade-in flex flex-col md:flex-row"
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      {/* Фотография слева */}
+      <div className="bg-gradient-to-br from-gray-100 to-gray-200 w-full md:w-64 flex-shrink-0 flex items-center justify-center relative overflow-hidden h-64 md:h-auto">
+        {manager.photo && !imageError ? (
+          <div className="relative w-full h-full flex items-center justify-center p-4">
+            <img
+              src={manager.photo}
+              alt={manager.name}
+              className="max-w-full max-h-full w-auto h-auto object-contain"
+              onError={() => setImageError(true)}
+            />
+          </div>
+        ) : (
+          <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+            <svg className="w-20 h-20 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+        )}
+      </div>
+      
+      {/* Информация справа */}
+      <div className="flex-1 p-6 md:p-8">
+        <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{manager.name}</h3>
+        <p className="text-primary-600 font-semibold mb-4 text-base leading-relaxed">{manager.position}</p>
+        {manager.bio && (
+          <p className="text-gray-700 mb-6">{manager.bio}</p>
+        )}
+        <div className="space-y-3">
+          {manager.email && (
+            <div className="flex items-center text-gray-600">
+              <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <a href={`mailto:${manager.email}`} className="hover:text-primary-600 transition-colors break-all">
+                {manager.email}
+              </a>
+            </div>
+          )}
+          {manager.phone && (
+            <div className="flex items-center text-gray-600">
+              <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <a href={`tel:${manager.phone.replace(/\s/g, '')}`} className="hover:text-primary-600 transition-colors">
+                {manager.phone}
+              </a>
+            </div>
+          )}
+          {manager.website && (
+            <div className="flex items-center text-gray-600">
+              <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              <a href={manager.website} target="_blank" rel="noopener noreferrer" className="hover:text-primary-600 transition-colors break-all">
+                {manager.website}
+              </a>
+            </div>
+          )}
+          {manager.workingHours && (
+            <div className="flex items-center text-gray-600">
+              <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{manager.workingHours}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ManagementPage() {
   const { currentLang } = useLanguage()
@@ -175,91 +272,9 @@ export default function ManagementPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6">
-              {managers.map((manager, index) => {
-                const [imageError, setImageError] = useState(false)
-                
-                return (
-                <div
-                  key={index}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl animate-fade-in flex flex-col md:flex-row"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                    {/* Фотография слева */}
-                    <div className="bg-gradient-to-br from-gray-100 to-gray-200 w-full md:w-64 flex-shrink-0 flex items-center justify-center relative overflow-hidden h-64 md:h-auto">
-                      {manager.photo && !imageError ? (
-                        <div className="relative w-full h-full flex items-center justify-center p-4">
-                          <img
-                            src={manager.photo}
-                            alt={manager.name}
-                            className="max-w-full max-h-full w-auto h-auto object-contain"
-                            onError={() => setImageError(true)}
-                          />
-                        </div>
-                      ) : (
-                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                      <svg className="w-20 h-20 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                      )}
-                  </div>
-                    
-                    {/* Информация справа */}
-                    <div className="flex-1 p-6 md:p-8">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{manager.name}</h3>
-                      <p className="text-primary-600 font-semibold mb-4 text-base leading-relaxed">{manager.position}</p>
-                      {manager.bio && (
-                    <p className="text-gray-700 mb-6">{manager.bio}</p>
-                      )}
-                      <div className="space-y-3">
-                        {manager.email && (
-                      <div className="flex items-center text-gray-600">
-                            <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                            <a href={`mailto:${manager.email}`} className="text-sm hover:text-primary-600 transition-colors break-all">
-                              {manager.email}
-                            </a>
-                      </div>
-                        )}
-                        {manager.phone && (
-                      <div className="flex items-center text-gray-600">
-                            <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                            <a href={`tel:${manager.phone.replace(/\s/g, '').replace(/[()]/g, '')}`} className="text-sm hover:text-primary-600 transition-colors">
-                              {manager.phone}
-                            </a>
-                          </div>
-                        )}
-                        {manager.website && (
-                          <div className="flex items-center text-gray-600">
-                            <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                            </svg>
-                            <a 
-                              href={manager.website} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-sm hover:text-primary-600 transition-colors break-all"
-                            >
-                              {manager.website}
-                            </a>
-                          </div>
-                        )}
-                        {manager.workingHours && (
-                          <div className="flex items-center text-gray-600">
-                            <svg className="w-5 h-5 mr-3 text-primary-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span className="text-sm">{manager.workingHours}</span>
-                      </div>
-                        )}
-                    </div>
-                  </div>
-                </div>
-                )
-              })}
+              {managers.map((manager, index) => (
+                <ManagerCard key={index} manager={manager} index={index} />
+              ))}
             </div>
           </div>
         </div>

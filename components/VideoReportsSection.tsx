@@ -106,19 +106,28 @@ const fallbackVideos: VideoItem[] = [
 ]
 
 // Преобразование YouTube видео в формат VideoItem
-const convertYouTubeToVideoItem = (youtubeVideo: YouTubeVideo, index: number): VideoItem => {
+const convertYouTubeToVideoItem = (youtubeVideo: YouTubeVideo, index: number, currentLang: Language = 'ru'): VideoItem => {
   const publishedDate = new Date(youtubeVideo.publishedAt)
-  const time = publishedDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  
+  // Используем локаль в зависимости от языка
+  let locale = 'ru-RU'
+  if (currentLang === 'uz') {
+    locale = 'uz-UZ'
+  } else if (currentLang === 'en') {
+    locale = 'en-US'
+  }
+  
+  const time = publishedDate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
   const date = publishedDate.toISOString().split('T')[0]
 
   // Проверяем, что ID валидный (не плейсхолдер)
   const isValidVideoId = youtubeVideo.id && !youtubeVideo.id.includes('VIDEO_ID') && youtubeVideo.id.length > 5
   
   // Используем thumbnail из API, если есть и он валидный, иначе создаем только если ID валидный
-  let thumbnail = youtubeVideo.thumbnail
+  let thumbnail: string = youtubeVideo.thumbnail || ''
   // Проверяем, что thumbnail не содержит VIDEO_ID
   if (thumbnail && thumbnail.includes('VIDEO_ID')) {
-    thumbnail = null
+    thumbnail = ''
   }
   if (!thumbnail && isValidVideoId) {
     thumbnail = getYouTubeThumbnail(youtubeVideo.id)
@@ -163,7 +172,7 @@ const VideoReportsSection = ({ currentLang }: VideoReportsSectionProps) => {
         const youtubeVideos = await getYouTubeVideos()
         if (youtubeVideos.length > 0) {
           const convertedVideos = youtubeVideos.map((video, index) =>
-            convertYouTubeToVideoItem(video, index)
+            convertYouTubeToVideoItem(video, index, currentLang)
           )
           setVideoData(convertedVideos)
         }
@@ -191,21 +200,34 @@ const VideoReportsSection = ({ currentLang }: VideoReportsSectionProps) => {
     }
   }
 
+  // Функция форматирования чисел для избежания проблем с гидратацией
+  // Используем фиксированную локаль для одинакового форматирования на сервере и клиенте
+  const formatNumber = (num: number): string => {
+    // Используем 'en-US' для единообразного форматирования (запятые как разделители тысяч)
+    return num.toLocaleString('en-US')
+  }
+
   const formatDate = (dateString: string, time: string) => {
     const date = new Date(dateString)
-    const options: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    
+    // Форматируем дату в зависимости от языка
+    const day = date.getDate()
+    const monthNames: { [key: string]: string[] } = {
+      uz: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'],
+      ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+      en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     }
+    
+    const month = monthNames[currentLang][date.getMonth()]
+    const year = date.getFullYear()
 
     let formattedDate = ''
     if (currentLang === 'uz') {
-      formattedDate = date.toLocaleDateString('uz-UZ', options)
+      formattedDate = `${day}-${month}, ${year}`
     } else if (currentLang === 'ru') {
-      formattedDate = date.toLocaleDateString('ru-RU', options)
+      formattedDate = `${day} ${month} ${year}`
     } else {
-      formattedDate = date.toLocaleDateString('en-US', options)
+      formattedDate = `${month} ${day}, ${year}`
     }
 
     return `${time}, ${formattedDate}`
@@ -374,7 +396,7 @@ const VideoReportsSection = ({ currentLang }: VideoReportsSectionProps) => {
                           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                         />
                       </svg>
-                      <span>{video.views.toLocaleString()} просмотров</span>
+                      <span>{formatNumber(video.views)} просмотров</span>
                     </div>
                     <span className="text-primary-600 font-semibold text-sm hover:text-primary-700 transition-colors">
                       Смотреть →
@@ -440,7 +462,7 @@ const VideoReportsSection = ({ currentLang }: VideoReportsSectionProps) => {
                     </svg>
                     {formatDate(video.date, video.time)}
                     <span className="mx-2">•</span>
-                    <span>{video.views.toLocaleString()} просмотров</span>
+                    <span>{formatNumber(video.views)} просмотров</span>
                   </div>
                 </div>
               )
