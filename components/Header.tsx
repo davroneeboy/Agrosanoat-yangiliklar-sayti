@@ -2,15 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { Language, getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
+import { addLangToUrl } from '@/lib/urlUtils'
 import Image from 'next/image'
 import ImageSlider from './ImageSlider'
-
-type HeaderProps = {
-  currentLang: Language
-  onLanguageChange: (lang: Language) => void
-}
 
 type DropdownItem = {
   label: string
@@ -24,8 +21,10 @@ type MenuItem = {
   dropdown?: DropdownItem[]
 }
 
-const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
+const Header = () => {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const { currentLang, setCurrentLang } = useLanguage()
   const isHomePage = pathname === '/'
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -184,34 +183,34 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
   }, [activeDropdown])
 
   const renderMenuItem = (item: MenuItem) => {
-    return (
-      <div
-        key={item.label}
-        className="relative"
-        onMouseEnter={() => handleMouseEnter(item.label)}
-        onMouseLeave={() => handleMouseLeave(item.label)}
-      >
+  return (
+              <div
+                key={item.label}
+                className="relative"
+                onMouseEnter={() => handleMouseEnter(item.label)}
+                onMouseLeave={() => handleMouseLeave(item.label)}
+              >
         {item.dropdown ? (
-          <button
+                <button
             className={`px-3 py-2 rounded transition-colors text-sm font-semibold uppercase whitespace-nowrap ${
-              activeDropdown === item.label
-                ? 'bg-primary-700 text-white'
+                    activeDropdown === item.label
+                      ? 'bg-primary-700 text-white'
                 : isHomePage
                 ? 'text-white hover:bg-white/20 drop-shadow-md'
                 : 'text-gray-800 hover:bg-primary-100'
-            }`}
-            onClick={() => handleClick(item.label)}
-            onKeyDown={(e) => handleKeyDown(e, item.label)}
-            aria-label={item.label}
-            aria-expanded={activeDropdown === item.label}
-            tabIndex={0}
-          >
-            {item.label}
-            <span className="ml-1 inline-block">▾</span>
-          </button>
+                  }`}
+                  onClick={() => handleClick(item.label)}
+                  onKeyDown={(e) => handleKeyDown(e, item.label)}
+                  aria-label={item.label}
+                  aria-expanded={activeDropdown === item.label}
+                  tabIndex={0}
+                >
+                  {item.label}
+                    <span className="ml-1 inline-block">▾</span>
+                </button>
         ) : (
           <Link
-            href={item.href}
+            href={addLangToUrl(item.href, currentLang)}
             className={`px-3 py-2 rounded transition-colors text-sm font-semibold uppercase whitespace-nowrap ${
               isHomePage
                 ? 'text-white hover:bg-white/20 drop-shadow-md'
@@ -226,8 +225,8 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
           </Link>
         )}
 
-        {item.dropdown && activeDropdown === item.label && (
-          <div
+                {item.dropdown && activeDropdown === item.label && (
+                  <div
             ref={(el) => {
               dropdownRefs.current[item.label] = el
             }}
@@ -236,7 +235,7 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
             onMouseLeave={() => handleMouseLeave(item.label)}
           >
             <div className="bg-primary-700 rounded-lg shadow-xl py-2">
-              {item.dropdown.map((dropdownItem) => (
+                    {item.dropdown.map((dropdownItem) => (
                 dropdownItem.external ? (
                   <a
                     key={dropdownItem.label}
@@ -252,22 +251,22 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
                     {dropdownItem.label}
                   </a>
                 ) : (
-                  <Link
-                    key={dropdownItem.label}
-                    href={dropdownItem.href}
+                      <Link
+                        key={dropdownItem.label}
+                        href={addLangToUrl(dropdownItem.href, currentLang)}
                     className="block px-4 py-2 text-white hover:bg-primary-600 transition-colors text-sm"
-                    onClick={() => {
-                      setActiveDropdown(null)
-                      setIsMobileMenuOpen(false)
-                    }}
-                  >
-                    {dropdownItem.label}
-                  </Link>
+                        onClick={() => {
+                          setActiveDropdown(null)
+                          setIsMobileMenuOpen(false)
+                        }}
+                      >
+                        {dropdownItem.label}
+                      </Link>
                 )
-              ))}
-            </div>
+                    ))}
+                  </div>
           </div>
-        )}
+                )}
       </div>
     )
   }
@@ -280,7 +279,7 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
           <div className={`flex flex-col py-3 ${isHomePage ? 'border-b border-white/20' : 'border-b border-gray-200 bg-white/95 backdrop-blur-sm'}`}>
           <div className="flex items-center justify-between flex-wrap gap-4">
             {/* Logo and Title */}
-            <Link href="/" className="flex items-center flex-1 min-w-0 hover:opacity-80 transition-opacity">
+            <Link href={addLangToUrl('/', currentLang)} className="flex items-center flex-1 min-w-0 hover:opacity-80 transition-opacity">
               <Image
                 src="/icon.png"
                 alt="Герб Узбекистана"
@@ -341,28 +340,28 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
                     >
                       {social.icon}
                     </a>
-                  ))}
+            ))}
                 </div>
 
-                {/* Language Switcher */}
+          {/* Language Switcher */}
                 <div className={`flex items-center space-x-1 pl-4 ${isHomePage ? 'border-l border-white/30' : 'border-l border-gray-300'}`}>
-                  {languages.map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => onLanguageChange(lang)}
+            {languages.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setCurrentLang(lang)}
                       className={`px-2 py-1 rounded transition-colors text-xs sm:text-sm font-medium ${
-                        currentLang === lang
-                          ? 'bg-primary-600 text-white'
+                  currentLang === lang
+                    ? 'bg-primary-600 text-white'
                           : isHomePage
                           ? 'text-white/90 hover:bg-white/20'
-                          : 'text-gray-700 hover:bg-primary-100'
-                      }`}
-                      aria-label={`Switch to ${lang.toUpperCase()}`}
-                      tabIndex={0}
-                    >
-                      {languageLabels[lang]}
-                    </button>
-                  ))}
+                    : 'text-gray-700 hover:bg-primary-100'
+                }`}
+                aria-label={`Switch to ${lang.toUpperCase()}`}
+                tabIndex={0}
+              >
+                {languageLabels[lang]}
+              </button>
+            ))}
                 </div>
               </div>
             </div>
@@ -375,36 +374,36 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
               {menuItems.map(renderMenuItem)}
             </nav>
           </div>
-        </div>
+          </div>
 
-        {/* Mobile Menu Button */}
-        <button
+          {/* Mobile Menu Button */}
+          <button
           className={`lg:hidden w-full py-3 flex items-center justify-between ${isHomePage ? 'text-white border-t border-white/20 bg-black/30' : 'text-gray-700 border-t border-gray-200 bg-white'}`}
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-          tabIndex={0}
-        >
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+            tabIndex={0}
+          >
           <span className="font-semibold uppercase">
             {currentLang === 'uz' && 'MENYU'}
             {currentLang === 'ru' && 'МЕНЮ'}
             {currentLang === 'en' && 'MENU'}
           </span>
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            {isMobileMenuOpen ? (
-              <path d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {isMobileMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
@@ -413,24 +412,24 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
               {menuItems.map((item) => (
                 <div key={item.label}>
                   {item.dropdown ? (
-                    <button
+                  <button
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors flex items-center justify-between font-semibold uppercase ${
                         isHomePage
                           ? 'text-white hover:bg-white/20'
                           : 'text-gray-700 hover:bg-primary-100'
                       }`}
-                      onClick={() => handleClick(item.label)}
-                      onKeyDown={(e) => handleKeyDown(e, item.label)}
-                      aria-label={item.label}
-                      aria-expanded={activeDropdown === item.label}
-                      tabIndex={0}
-                    >
-                      <span>{item.label}</span>
+                    onClick={() => handleClick(item.label)}
+                    onKeyDown={(e) => handleKeyDown(e, item.label)}
+                    aria-label={item.label}
+                    aria-expanded={activeDropdown === item.label}
+                    tabIndex={0}
+                  >
+                    <span>{item.label}</span>
                       <span className={isHomePage ? 'text-white' : 'text-primary-600'}>▾</span>
-                    </button>
+                  </button>
                   ) : (
                     <Link
-                      href={item.href}
+                      href={addLangToUrl(item.href, currentLang)}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-colors font-semibold uppercase ${
                         isHomePage
                           ? 'text-white hover:bg-white/20'
@@ -466,21 +465,21 @@ const Header = ({ currentLang, onLanguageChange }: HeaderProps) => {
                             {dropdownItem.label}
                           </a>
                         ) : (
-                          <Link
-                            key={dropdownItem.label}
-                            href={dropdownItem.href}
+                        <Link
+                          key={dropdownItem.label}
+                          href={addLangToUrl(dropdownItem.href, currentLang)}
                             className={`block px-4 py-2 rounded transition-colors ${
                               isHomePage
                                 ? 'text-white hover:bg-white/20'
                                 : 'text-gray-700 hover:bg-primary-100'
                             }`}
-                            onClick={() => {
-                              setActiveDropdown(null)
-                              setIsMobileMenuOpen(false)
-                            }}
-                          >
-                            {dropdownItem.label}
-                          </Link>
+                          onClick={() => {
+                            setActiveDropdown(null)
+                            setIsMobileMenuOpen(false)
+                          }}
+                        >
+                          {dropdownItem.label}
+                        </Link>
                         )
                       ))}
                     </div>

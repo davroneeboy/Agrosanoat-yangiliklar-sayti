@@ -7,14 +7,15 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import PageHeader from '@/components/PageHeader'
-import { Language, getTranslation } from '@/lib/i18n'
+import { getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
 import { getNewsById, type News } from '@/lib/api-public'
 import Image from 'next/image'
 
 export default function NewsDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const [currentLang, setCurrentLang] = useState<Language>('ru')
+  const { currentLang } = useLanguage()
   const [news, setNews] = useState<News | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -57,7 +58,7 @@ export default function NewsDetailPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Header currentLang={currentLang} onLanguageChange={setCurrentLang} />
+        <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -76,7 +77,7 @@ export default function NewsDetailPage() {
   if (error || !news) {
     return (
       <main className="min-h-screen bg-gray-50">
-        <Header currentLang={currentLang} onLanguageChange={setCurrentLang} />
+        <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error || 'Новость не найдена'}
@@ -97,7 +98,7 @@ export default function NewsDetailPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header currentLang={currentLang} onLanguageChange={setCurrentLang} />
+      <Header />
       <PageHeader
         currentLang={currentLang}
         title={{

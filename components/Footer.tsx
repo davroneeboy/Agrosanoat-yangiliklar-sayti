@@ -3,6 +3,7 @@
 import { useState, FormEvent, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Language, getTranslation } from '@/lib/i18n'
+import { addLangToUrl } from '@/lib/urlUtils'
 
 type FooterProps = {
   currentLang: Language
@@ -42,8 +43,9 @@ const Footer = ({ currentLang }: FooterProps) => {
     },
   }
 
-  // Ссылки на существующие страницы
+  // Ссылки на все страницы сайта
   const pageLinks = [
+    // О АГЕНТСТВЕ
     { 
       label: currentLang === 'uz' ? 'Agentlik haqida' : currentLang === 'ru' ? 'Об агентстве' : 'About Agency', 
       href: '/about' 
@@ -64,17 +66,60 @@ const Footer = ({ currentLang }: FooterProps) => {
       label: currentLang === 'uz' ? 'Hududiy boshqarmalar' : currentLang === 'ru' ? 'Территориальные управления' : 'Territorial Departments', 
       href: '/about/territorial' 
     },
+    // ЦИФРОВОЕ ПРАВИТЕЛЬСТВО
     { 
       label: currentLang === 'uz' ? 'Raqamli hukumat' : currentLang === 'ru' ? 'Цифровое правительство' : 'Digital Government', 
       href: '/digital-gov' 
     },
     { 
+      label: currentLang === 'uz' ? 'Korrupsiyaga qarshi kurashish bo\'yicha murojaat' : currentLang === 'ru' ? 'Обращение по противодействию коррупции' : 'Anti-Corruption Appeal', 
+      href: '/anti-corruption' 
+    },
+    // ИНФОРМАЦИОННЫЙ СЕРВИС
+    { 
       label: currentLang === 'uz' ? 'Axborot xizmati' : currentLang === 'ru' ? 'Информационный сервис' : 'Information Service', 
       href: '/info-service' 
     },
     { 
+      label: currentLang === 'uz' ? 'Press-relizlar' : currentLang === 'ru' ? 'Пресс-релизы' : 'Press Releases', 
+      href: '/press-releases' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Matbuot anjumanlari' : currentLang === 'ru' ? 'Пресс-конференции' : 'Press Conferences', 
+      href: '/press-conferences' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Majlislar' : currentLang === 'ru' ? 'Заседания' : 'Meetings', 
+      href: '/meetings' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Voqealar taqvimi' : currentLang === 'ru' ? 'Календарь событий' : 'Event Calendar', 
+      href: '/events' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Rahbariyatning bayonotlari va nutqlari' : currentLang === 'ru' ? 'Заявления и выступления руководства' : 'Management Statements and Speeches', 
+      href: '/statements' 
+    },
+    { 
       label: currentLang === 'uz' ? 'Yangiliklar' : currentLang === 'ru' ? 'Новости' : 'News', 
       href: '/news' 
+    },
+    // СВЯЗЬ
+    { 
+      label: currentLang === 'uz' ? 'Kontaktlar' : currentLang === 'ru' ? 'Контакты' : 'Contacts', 
+      href: '/contacts' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'So\'rovnomalar' : currentLang === 'ru' ? 'Опросы' : 'Surveys', 
+      href: '/surveys' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Qayta aloqa' : currentLang === 'ru' ? 'Обратная связь' : 'Feedback', 
+      href: '/feedback' 
+    },
+    { 
+      label: currentLang === 'uz' ? 'Korrupsiyani oldini olish bo\'yicha murojaat' : currentLang === 'ru' ? 'Обращение по предупреждению коррупции' : 'Anti-Corruption Prevention Appeal', 
+      href: '/anti-corruption-prevention' 
     },
   ]
 
@@ -277,28 +322,93 @@ const Footer = ({ currentLang }: FooterProps) => {
                 </svg>
                 <p className="text-gray-300 text-sm">{contactInfo.workingHours[currentLang]}</p>
               </div>
+              
+              {/* Социальные сети */}
+              <div className="mt-6 pt-6 border-t border-primary-700">
+                <h4 className="text-base font-semibold mb-3">{t.footer.socialMedia}</h4>
+                <div className="flex space-x-4">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-300 hover:text-white transition-colors"
+                      aria-label={social.name}
+                      tabIndex={0}
+                    >
+                      {social.icon}
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Быстрые ссылки на страницы */}
-          <div>
-            <h3 className="text-lg sm:text-xl font-bold mb-4">
-              {currentLang === 'uz' ? 'Sahifalar' : currentLang === 'ru' ? 'Страницы' : 'Pages'}
-            </h3>
-            <ul className="space-y-2">
-              {pageLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-300 hover:text-white transition-colors text-sm"
-                    tabIndex={0}
-                    aria-label={link.label}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Быстрые ссылки на страницы - разделены на категории */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* О АГЕНТСТВЕ */}
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold mb-4">
+                {currentLang === 'uz' ? 'Agentlik haqida' : currentLang === 'ru' ? 'О АГЕНТСТВЕ' : 'ABOUT AGENCY'}
+              </h3>
+              <ul className="space-y-2">
+                {pageLinks.slice(0, 5).map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-300 hover:text-white transition-colors text-sm"
+                      tabIndex={0}
+                      aria-label={link.label}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ЦИФРОВОЕ ПРАВИТЕЛЬСТВО и ИНФОРМАЦИОННЫЙ СЕРВИС */}
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold mb-4">
+                {currentLang === 'uz' ? 'Xizmatlar' : currentLang === 'ru' ? 'СЕРВИСЫ' : 'SERVICES'}
+              </h3>
+              <ul className="space-y-2">
+                {pageLinks.slice(5, 13).map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={addLangToUrl(link.href, currentLang)}
+                      className="text-gray-300 hover:text-white transition-colors text-sm"
+                      tabIndex={0}
+                      aria-label={link.label}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* СВЯЗЬ */}
+            <div>
+              <h3 className="text-lg sm:text-xl font-bold mb-4">
+                {currentLang === 'uz' ? 'Bog\'lanish' : currentLang === 'ru' ? 'СВЯЗЬ' : 'CONTACT'}
+              </h3>
+              <ul className="space-y-2">
+                {pageLinks.slice(13).map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={addLangToUrl(link.href, currentLang)}
+                      className="text-gray-300 hover:text-white transition-colors text-sm"
+                      tabIndex={0}
+                      aria-label={link.label}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
           </div>
 
@@ -421,25 +531,6 @@ const Footer = ({ currentLang }: FooterProps) => {
           </div>
         </div>
 
-        {/* Социальные сети */}
-        <div className="mt-8 pt-8 border-t border-primary-700">
-          <div className="flex flex-col items-center">
-            <h4 className="text-base sm:text-lg font-semibold mb-3">{t.footer.socialMedia}</h4>
-            <div className="flex space-x-4 justify-center">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    className="text-gray-300 hover:text-white transition-colors"
-                    aria-label={social.name}
-                    tabIndex={0}
-                  >
-                    {social.icon}
-                  </a>
-                ))}
-              </div>
-          </div>
-        </div>
       </div>
     </footer>
   )

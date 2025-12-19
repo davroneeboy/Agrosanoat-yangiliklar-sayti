@@ -1,20 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import PageHeader from '@/components/PageHeader'
-import { Language, getTranslation } from '@/lib/i18n'
+import { getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
 import Link from 'next/link'
 
 export default function CentralPage() {
-  const [currentLang, setCurrentLang] = useState<Language>('ru')
+  const { currentLang } = useLanguage()
   const t = getTranslation(currentLang)
-
-  const handleLanguageChange = (lang: Language) => {
-    setCurrentLang(lang)
-  }
 
   const departmentsData = {
     uz: [
@@ -98,7 +94,7 @@ export default function CentralPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header currentLang={currentLang} onLanguageChange={handleLanguageChange} />
+      <Header />
       
       <PageHeader
         currentLang={currentLang}
@@ -136,15 +132,15 @@ export default function CentralPage() {
                 {currentLang === 'en' && 'Central Office Departments'}
               </h2>
               <div className="space-y-3">
-                {departments.map((dept, index) => (
-                  <div
-                    key={index}
+              {departments.map((dept, index) => (
+                <div
+                  key={index}
                     className="flex items-start p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-primary-600 font-semibold mr-4 min-w-[30px]">{index + 1}.</span>
                     <h3 className="text-base md:text-lg font-semibold text-gray-900 flex-1">{dept.name}</h3>
-                  </div>
-                ))}
+                </div>
+              ))}
               </div>
             </div>
 

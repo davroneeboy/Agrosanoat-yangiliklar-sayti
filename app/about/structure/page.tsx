@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import PageHeader from '@/components/PageHeader'
-import { Language, getTranslation } from '@/lib/i18n'
+import { getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
 import Link from 'next/link'
 
 interface Department {
@@ -30,12 +30,8 @@ interface DeputyDirector {
 }
 
 export default function StructurePage() {
-  const [currentLang, setCurrentLang] = useState<Language>('ru')
+  const { currentLang } = useLanguage()
   const t = getTranslation(currentLang)
-
-  const handleLanguageChange = (lang: Language) => {
-    setCurrentLang(lang)
-  }
 
   const structureData = {
     director: {
@@ -144,7 +140,7 @@ export default function StructurePage() {
               uz: 'Marketing va eksport bo\'limi',
               ru: 'Отдел маркетинга и экспорта',
               en: 'Marketing and Export Department',
-            },
+    },
             positions: '2*',
             extraBudget: true,
           },
@@ -249,7 +245,7 @@ export default function StructurePage() {
           uz: 'Investitsiyalar va xalqaro aloqalar bo\'limi',
           ru: 'Отдел инвестиций и международных связей',
           en: 'Investments and International Relations Department',
-        },
+    },
         positions: '2',
       },
       {
@@ -274,7 +270,7 @@ export default function StructurePage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header currentLang={currentLang} onLanguageChange={handleLanguageChange} />
+      <Header />
       <PageHeader
         currentLang={currentLang}
         title={t.about.structure.title}
@@ -349,9 +345,9 @@ export default function StructurePage() {
                   <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-400 rounded-xl p-5 text-center shadow-lg hover:shadow-xl transition-all duration-300 w-full md:w-auto md:min-w-[220px]">
                     <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
                       <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
                     <h3 className="text-base font-bold text-gray-900 mb-2 leading-tight">{structureData.assistant[currentLang]}</h3>
                   </div>
                 </div>
@@ -417,8 +413,8 @@ export default function StructurePage() {
                       </div>
                     </div>
                   ))}
-                </div>
               </div>
+            </div>
 
               {/* Footer Info */}
               <div className="mt-8 pt-6 border-t-2 border-gray-300">
@@ -432,7 +428,7 @@ export default function StructurePage() {
                     {currentLang === 'uz' && '* Yulduzcha (*) bilan belgilangan lavozimlar byudjetdan tashqari mablag\'lar hisobidan moliyalashtiriladi.'}
                     {currentLang === 'ru' && '* Должности, отмеченные звездочкой (*), финансируются за счет внебюджетных средств.'}
                     {currentLang === 'en' && '* Positions marked with an asterisk (*) are financed from extra-budgetary fund resources.'}
-                  </p>
+                </p>
                 </div>
               </div>
             </div>

@@ -6,12 +6,13 @@ import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import PageHeader from '@/components/PageHeader'
 import ScrollReveal from '@/components/ScrollReveal'
-import { Language, getTranslation } from '@/lib/i18n'
+import { getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
 import { getAboutList, type About } from '@/lib/api-public'
 import Image from 'next/image'
 
 export default function AboutPage() {
-  const [currentLang, setCurrentLang] = useState<Language>('ru')
+  const { currentLang } = useLanguage()
   const [aboutData, setAboutData] = useState<About | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,10 +36,6 @@ export default function AboutPage() {
 
     fetchAbout()
   }, [])
-
-  const handleLanguageChange = (lang: Language) => {
-    setCurrentLang(lang)
-  }
 
   // Функция для форматирования текста с абзацами
   const formatTextWithParagraphs = (text: string): string => {
@@ -71,7 +68,7 @@ export default function AboutPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header currentLang={currentLang} onLanguageChange={handleLanguageChange} />
+      <Header />
       <PageHeader
         currentLang={currentLang}
         title={t.about.title}

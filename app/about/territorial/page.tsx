@@ -1,20 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import PageHeader from '@/components/PageHeader'
-import { Language, getTranslation } from '@/lib/i18n'
+import { getTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/useLanguage'
 import Link from 'next/link'
 
 export default function TerritorialPage() {
-  const [currentLang, setCurrentLang] = useState<Language>('ru')
+  const { currentLang } = useLanguage()
   const t = getTranslation(currentLang)
-
-  const handleLanguageChange = (lang: Language) => {
-    setCurrentLang(lang)
-  }
 
   const regionsData = {
     uz: [
@@ -478,7 +474,7 @@ export default function TerritorialPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Header currentLang={currentLang} onLanguageChange={handleLanguageChange} />
+      <Header />
       <PageHeader
         currentLang={currentLang}
         title={t.about.territorial.title}
@@ -586,7 +582,7 @@ export default function TerritorialPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="text-sm">{region.workingHours}</span>
-                      </div>
+                    </div>
                     )}
                   </div>
                 </div>

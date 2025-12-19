@@ -26,7 +26,7 @@ export async function GET() {
       const searchResponse = await fetch(
         `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&q=@${YOUTUBE_CHANNEL_USERNAME}&type=channel&part=snippet&maxResults=1`
       )
-      
+
       if (searchResponse.ok) {
         const searchData = await searchResponse.json()
         if (searchData.items && searchData.items.length > 0) {
@@ -79,19 +79,19 @@ export async function GET() {
     
     let videoDetails: any = {}
     if (videoIds) {
-      const videoDetailsResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&id=${videoIds}&part=statistics,contentDetails`
-      )
+    const videoDetailsResponse = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&id=${videoIds}&part=statistics,contentDetails`
+    )
 
-      if (videoDetailsResponse.ok) {
-        const detailsData = await videoDetailsResponse.json()
-        if (detailsData.items) {
-          detailsData.items.forEach((item: any) => {
-            videoDetails[item.id] = {
+    if (videoDetailsResponse.ok) {
+      const detailsData = await videoDetailsResponse.json()
+      if (detailsData.items) {
+        detailsData.items.forEach((item: any) => {
+          videoDetails[item.id] = {
               viewCount: parseInt(item.statistics?.viewCount || '0', 10),
               duration: item.contentDetails?.duration,
-            }
-          })
+          }
+        })
         }
       } else {
         console.warn('YouTube API: Failed to fetch video details')
@@ -114,22 +114,22 @@ export async function GET() {
     const videos = data.items
       .filter((item: any) => item.id?.videoId) // Фильтруем только валидные видео
       .map((item: any) => {
-        const details = videoDetails[item.id.videoId] || {}
-        return {
-          id: item.id.videoId,
+      const details = videoDetails[item.id.videoId] || {}
+      return {
+        id: item.id.videoId,
           title: item.snippet?.title || 'Без названия',
           description: item.snippet?.description || '',
-          thumbnail:
+        thumbnail:
             item.snippet?.thumbnails?.maxres?.url ||
             item.snippet?.thumbnails?.high?.url ||
             item.snippet?.thumbnails?.medium?.url ||
             `https://img.youtube.com/vi/${item.id.videoId}/maxresdefault.jpg`,
           publishedAt: item.snippet?.publishedAt || new Date().toISOString(),
           channelTitle: item.snippet?.channelTitle || '',
-          viewCount: details.viewCount || 0,
-          duration: details.duration ? formatDuration(details.duration) : undefined,
-        }
-      })
+        viewCount: details.viewCount || 0,
+        duration: details.duration ? formatDuration(details.duration) : undefined,
+      }
+    })
 
     return NextResponse.json({ videos })
   } catch (error) {
