@@ -72,13 +72,17 @@ export function useLanguage() {
     const langParam = searchParams.get('lang') as Language | null
     if (langParam && ['uz', 'ru', 'en'].includes(langParam) && langParam !== currentLang) {
       setCurrentLangState(langParam)
-      localStorage.setItem('language', langParam)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('language', langParam)
+      }
     }
   }, [searchParams, isInitialized, currentLang])
 
   const setCurrentLang = useCallback((lang: Language) => {
     setCurrentLangState(lang)
-    localStorage.setItem('language', lang)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('language', lang)
+    }
     updateUrl(lang)
   }, [updateUrl])
 
