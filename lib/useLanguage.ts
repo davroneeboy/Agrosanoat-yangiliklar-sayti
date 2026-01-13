@@ -15,16 +15,16 @@ export function useLanguage() {
     if (langParam && ['uz', 'ru', 'en'].includes(langParam)) {
       return langParam
     }
-    // На сервере localStorage недоступен, поэтому всегда возвращаем 'ru'
+    // На сервере localStorage недоступен, поэтому всегда возвращаем 'uz'
     if (typeof window === 'undefined') {
-      return 'ru'
+      return 'uz'
     }
     // На клиенте проверяем localStorage
     const savedLang = localStorage.getItem('language') as Language | null
     if (savedLang && ['uz', 'ru', 'en'].includes(savedLang)) {
       return savedLang
     }
-    return 'ru'
+    return 'uz'
   }, [searchParams])
   
   const [currentLang, setCurrentLangState] = useState<Language>(initialLang)
@@ -56,9 +56,12 @@ export function useLanguage() {
         if (savedLang && ['uz', 'ru', 'en'].includes(savedLang) && savedLang !== currentLang) {
           setCurrentLangState(savedLang)
           updateUrl(savedLang)
-        } else if (!savedLang && currentLang !== 'ru') {
-          setCurrentLangState('ru')
-          updateUrl('ru')
+        } else {
+          // Если нет сохраненного языка, устанавливаем 'uz' по умолчанию и добавляем в URL
+          if (currentLang !== 'uz') {
+            setCurrentLangState('uz')
+          }
+          updateUrl('uz')
         }
       }
       setIsInitialized(true)
