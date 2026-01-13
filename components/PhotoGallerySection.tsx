@@ -13,85 +13,142 @@ const PhotoGallerySection = ({ currentLang }: PhotoGallerySectionProps) => {
   const t = getTranslation(currentLang)
 
   const photos = [
+    // Сады (Bog'lar)
     {
       id: 1,
-      url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&h=600&fit=crop',
       title: {
-        uz: 'Qishloq xo\'jaligi maydonlari',
-        ru: 'Сельскохозяйственные поля',
-        en: 'Agricultural fields',
+        uz: 'Mevali bog\'',
+        ru: 'Фруктовый сад',
+        en: 'Fruit orchard',
       },
     },
     {
       id: 2,
-      url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&h=600&fit=crop',
       title: {
-        uz: 'Paxta yetishtirish',
-        ru: 'Выращивание хлопка',
-        en: 'Cotton cultivation',
+        uz: 'Olma bog\'i',
+        ru: 'Яблоневый сад',
+        en: 'Apple orchard',
       },
     },
     {
       id: 3,
-      url: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=600&fit=crop',
       title: {
-        uz: 'Meva-sabzavot yetishtirish',
-        ru: 'Выращивание фруктов и овощей',
-        en: 'Fruit and vegetable cultivation',
+        uz: 'Meva yig\'ish',
+        ru: 'Сбор фруктов',
+        en: 'Fruit harvesting',
       },
     },
     {
       id: 4,
-      url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&h=600&fit=crop',
       title: {
-        uz: 'Tuproq tahlili',
-        ru: 'Анализ почвы',
-        en: 'Soil analysis',
+        uz: 'Meva-sabzavot bog\'i',
+        ru: 'Сад фруктов и овощей',
+        en: 'Fruit and vegetable garden',
       },
     },
     {
       id: 5,
-      url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop',
       title: {
-        uz: 'Issiqxona',
-        ru: 'Теплица',
-        en: 'Greenhouse',
+        uz: 'Qishloq xo\'jaligi bog\'lari',
+        ru: 'Сельскохозяйственные сады',
+        en: 'Agricultural gardens',
       },
     },
+    // Виноградники (Tokzorlar)
     {
       id: 6,
       url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
       title: {
-        uz: 'Sug\'orish tizimi',
-        ru: 'Система орошения',
-        en: 'Irrigation system',
+        uz: 'Tokzor',
+        ru: 'Виноградник',
+        en: 'Vineyard',
       },
     },
     {
       id: 7,
-      url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=600&fit=crop',
+      url: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&h=600&fit=crop',
       title: {
-        uz: 'Traktor va texnika',
-        ru: 'Тракторы и техника',
-        en: 'Tractors and machinery',
+        uz: 'Uzum yetishtirish',
+        ru: 'Выращивание винограда',
+        en: 'Grape cultivation',
       },
     },
     {
       id: 8,
       url: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop',
       title: {
-        uz: 'Hosil yig\'ish',
-        ru: 'Сбор урожая',
-        en: 'Harvesting',
+        uz: 'Uzum yig\'ish',
+        ru: 'Сбор винограда',
+        en: 'Grape harvesting',
       },
     },
     {
       id: 9,
+      url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Tokzor maydoni',
+        ru: 'Виноградное поле',
+        en: 'Vineyard field',
+      },
+    },
+    // Теплицы (Issiqxonalar)
+    {
+      id: 10,
+      url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Zamonaviy issiqxona',
+        ru: 'Современная теплица',
+        en: 'Modern greenhouse',
+      },
+    },
+    {
+      id: 11,
+      url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Issiqxonada sabzavot yetishtirish',
+        ru: 'Выращивание овощей в теплице',
+        en: 'Vegetable cultivation in greenhouse',
+      },
+    },
+    {
+      id: 12,
+      url: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Issiqxona kompleksi',
+        ru: 'Тепличный комплекс',
+        en: 'Greenhouse complex',
+      },
+    },
+    {
+      id: 13,
+      url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Issiqxonada gidroponika',
+        ru: 'Гидропоника в теплице',
+        en: 'Hydroponics in greenhouse',
+      },
+    },
+    {
+      id: 14,
       url: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&h=600&fit=crop',
       title: {
-        uz: 'Bog\' va tokzorlar',
-        ru: 'Сады и виноградники',
-        en: 'Gardens and vineyards',
+        uz: 'Issiqxona texnologiyasi',
+        ru: 'Тепличные технологии',
+        en: 'Greenhouse technology',
+      },
+    },
+    {
+      id: 15,
+      url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=600&fit=crop',
+      title: {
+        uz: 'Yil davomida issiqxona',
+        ru: 'Круглогодичная теплица',
+        en: 'Year-round greenhouse',
       },
     },
   ]
