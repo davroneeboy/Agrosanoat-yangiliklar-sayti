@@ -11,7 +11,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
  * Получить посты из публичного Telegram канала через парсинг HTML
  * Telegram предоставляет публичную страницу канала по адресу: https://t.me/s/channelname
  */
-async function getTelegramPostsFromRSS(channelUsername: string) {
+async function getTelegramPostsFromRSS(channelUsername: string): Promise<any[]> {
   try {
     // Убираем @ если есть
     const cleanUsername = channelUsername.replace('@', '')
@@ -410,7 +410,7 @@ async function getTelegramPostsFromRSS(channelUsername: string) {
 /**
  * Получить посты через Telegram Bot API (если есть токен)
  */
-async function getTelegramPostsFromBotAPI(channelUsername: string) {
+async function getTelegramPostsFromBotAPI(channelUsername: string): Promise<any[] | null> {
   if (!TELEGRAM_BOT_TOKEN) {
     return null
   }
@@ -454,11 +454,13 @@ export async function GET() {
     let posts: any[] | null = await getTelegramPostsFromBotAPI(channelUsername)
     
     // Если Bot API не работает, используем RSS парсинг
-    if (!posts || posts.length === 0) {
+    if (posts === null) {
+      posts = await getTelegramPostsFromRSS(channelUsername)
+    } else if (posts.length === 0) {
       posts = await getTelegramPostsFromRSS(channelUsername)
     }
 
-    if (!posts || posts.length === 0) {
+    if (posts === null || posts.length === 0) {
       console.warn('Telegram API: No posts found')
       return NextResponse.json({ posts: [] })
     }
