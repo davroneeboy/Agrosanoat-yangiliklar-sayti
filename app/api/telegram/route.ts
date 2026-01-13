@@ -203,8 +203,9 @@ async function getTelegramPostsFromRSS(channelUsername: string) {
       // Метод 3: Ищем изображения внутри блока сообщения, но исключаем аватары и эмблемы
       if (!thumbnail) {
         // Ищем img теги, которые находятся внутри блока сообщения, но не являются аватаром
-        const allImages = messageHtml.matchAll(/<img[^>]*src="(https:\/\/[^"]+)"[^>]*>/gi)
-        for (const imgMatch of allImages) {
+        const imgRegex = /<img[^>]*src="(https:\/\/[^"]+)"[^>]*>/gi
+        let imgMatch: RegExpExecArray | null
+        while ((imgMatch = imgRegex.exec(messageHtml)) !== null) {
           const imgUrl = imgMatch[1]
           const fullMatch = imgMatch[0]
           
